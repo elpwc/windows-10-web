@@ -1,0 +1,53 @@
+.titlebar {
+  display: flex;
+  background-color: rgb(69, 87, 87);
+  color: white;
+  height: 30px;
+  font-size: 0.8em;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.titlebarTitle {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.content {
+  background-color: whitesmoke;
+  width: 100%;
+  height: calc( 100% - 30px );
+  box-sizing:content-box;
+}
+
+.controlBtns {
+  display: flex;
+  justify-self: right;
+}
+
+.controlBtns button {
+  height: 100%;
+  min-height: 100%;
+  min-width: 2.8em;
+  border: none;
+  background-color: rgb(0 0 0 / 0%);
+  color: inherit;
+  transition: all 0.4s;
+}
+
+.controlBtns button:hover {
+  background-color: rgb(255 255 255 / 20%);
+}
+
+.controlBtns button:active {
+  background-color: rgb(255 255 255 / 50%);
+}
+
+.controlBtns .closebtn:hover {
+  background-color: rgb(255 0 0 / 100%);
+}
+
+.controlBtns .closebtn:active {
+  background-color: rgb(255 0 0 / 50%);
+}

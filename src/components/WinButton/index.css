@@ -1,0 +1,20 @@
+button {
+  background-color: rgb(225, 225, 225);
+  border: solid 1px rgb(173, 173, 173);
+  border-radius: 0px;
+  transition: all 0.35s;
+  padding: 5px 10px;
+  width: fit-content;
+  height: fit-content;
+}
+
+button:hover {
+  background-color: rgb(229, 241, 251);
+  border: solid 1px rgb(0, 120, 215);
+}
+
+button:active {
+  transition: all 0s;
+  background-color: rgb(204, 228, 247);
+  border: solid 1px rgb(0, 84, 153);
+}

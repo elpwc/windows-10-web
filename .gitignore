@@ -23,5 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 /src/resource/icons/*
+!/src/resource/icons/*_3.ico
+!/src/resource/icons/*_15.ico
 !/src/resource/icons/*_55.ico
 !/src/resource/icons/*_109.ico
+!/src/resource/icons/*_6200.ico

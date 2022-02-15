@@ -22,6 +22,10 @@
   max-width: 150px;
 }
 
+.taskbaritem.focus {
+  background-color:rgba(255, 255, 255, 0.25) ;
+}
+
 .taskbaritem.long span {
   width: 100%;
   white-space: nowrap;
@@ -39,9 +43,16 @@
 .taskbaritemBorders {
   position: absolute;
   bottom: 0;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background-color: rgb(255 255 255 / 60%);
+  transition: all 0.2s;
+}
+
+.taskbaritem.focus .taskbaritemBorders {
   left: 0;
   right: 0;
-  height: 2px;
   background-color: rgb(255 255 255 / 60%);
 }
 
@@ -108,6 +119,7 @@
   padding: 5px;
   margin: 5px;
   user-select: none;
+  overflow: hidden;
 }
 
 .fileIcon img {
@@ -119,6 +131,9 @@
   width: 100%;
   text-align: center;
   font-size: 0.8em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .fileIcon:hover {
