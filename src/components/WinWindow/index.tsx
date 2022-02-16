@@ -12,6 +12,7 @@ interface WindowProps {
   title: string;
   zIndex: number;
   icon: string;
+  titleBar?: JSX.Element | never[];
 }
 
 interface Point {

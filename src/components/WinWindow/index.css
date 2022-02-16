@@ -19,6 +19,7 @@
   width: 100%;
   height: calc( 100% - 30px );
   box-sizing:content-box;
+  display: flex;
 }
 
 .controlBtns {
