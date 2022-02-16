@@ -51,10 +51,14 @@ export default (props: WindowProps) => {
         }}
       >
         <div
-          className="titlebar"
-          onMouseDown={e => {
-            setLastPosition({ x: e.clientX, y: e.clientY });
-            setIsMouseDown(true);
+          className="dragArea"
+          style={{
+            position: 'fixed',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            display: isMouseDown ? 'inherit' : 'none',
           }}
           onMouseUp={() => {
             setIsMouseDown(false);
@@ -65,6 +69,16 @@ export default (props: WindowProps) => {
               setCrtWinPosition({ x: crtWinPosition.x + crtPosition.x, y: crtWinPosition.y + crtPosition.y });
               setLastPosition({ x: e.clientX, y: e.clientY });
             }
+          }}
+        ></div>
+        <div
+          className="titlebar"
+          onMouseDown={e => {
+            setLastPosition({ x: e.clientX, y: e.clientY });
+            setIsMouseDown(true);
+          }}
+          onMouseUp={() => {
+            setIsMouseDown(false);
           }}
         >
           <div className="titlebarTitle">
