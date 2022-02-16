@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import WinButton from './components/WinButton';
 import WinWindow from './components/WinWindow';
 import { SearchSVG, WindowsLogoSVG } from './svg';
 
 function App() {
+  const [crtTime, setCrtTime]: [number, any] = useState(Date.now());
+
+  useEffect(() => {
+    setInterval(() => {
+      setCrtTime(Date.now());
+    }, 1000);
+  }, []);
+
   return (
     <div className="App">
       <div>
@@ -125,9 +133,9 @@ function App() {
                 <div className="taskbaritem" style={{ textAlign: 'center' }}>
                   <div className="taskbaritemContents">
                     <span>
-                      11:45
+                      {`${new Date(crtTime).getHours()}:${new Date(crtTime).getMinutes()}`}
                       <br />
-                      2022/02/15
+                      {`${new Date(crtTime).getFullYear()}/${String(new Date(crtTime).getMonth() + 1).padStart(2, '0')}/${String(new Date(crtTime).getDate()).padStart(2, '0')}`}
                     </span>
                   </div>
                 </div>

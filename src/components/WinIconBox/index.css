@@ -1,0 +1,35 @@
+
+.fileIcon {
+    width: 55px;
+    height: fit-content;
+    max-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: solid 1px rgb(5 5 5 / 0%);
+    padding: 5px;
+    margin: 5px;
+    user-select: none;
+    overflow: hidden;
+  }
+  
+  .fileIcon img {
+    width: 90%;
+  }
+  
+  .fileIcon p {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .fileIcon:hover {
+    background-color: rgb(84 155 220 / 15%);
+    border: solid 1px rgb(84 155 220 / 80%);
+  }
+  
