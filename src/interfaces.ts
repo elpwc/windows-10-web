@@ -8,25 +8,22 @@ export interface WinWindowStruct {
   icon: string;
 }
 
-export interface WinIcon {
+export enum FileType {
+  Default,
+  Folder,
+  Program,
+  Driver,
+}
+
+export interface WinFile {
   id: number;
   filename: string;
   icon: string;
   parent: number;
+  type: FileType;
+  window?: WinWindowStruct | null;
 }
 
-export interface WinDrive extends WinIcon {
-  totalSizeB: number;
-  usingSizeB: number;
-  driveLetter: string;
-}
-
-export interface WinFolder extends WinIcon {}
-
-export interface WinProcess extends WinIcon {
-  window: WinWindowStruct | null;
-}
-
-export interface RunningWinProcess extends WinProcess {
+export interface RunningWinProcess extends WinFile {
   pid: number;
 }

@@ -2,67 +2,29 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import WinButton from './components/WinButton';
 import WinWindow from './components/WinWindow';
-import { RunningWinProcess, WinDrive, WinFolder, WinIcon, WinProcess, WinWindowStruct } from './interfaces';
+import { FileType, RunningWinProcess, WinFile, WinWindowStruct } from './interfaces';
 import { SearchSVG, WindowsLogoSVG } from './svg';
 import _ from 'lodash';
 import WinIconBox from './components/WinIconBox';
 import { getWindowJSX } from './utils';
+import { Global } from './global';
+import { FolderManager } from './folderManager';
+import { ProcessManager } from './processManager';
 
 function App() {
-  const [files, setFiles]: [(WinIcon | WinDrive | WinProcess | WinFolder)[], any] = useState([]);
-  const [currentProcesses, setCurrentProcesses]: [RunningWinProcess[], any] = useState([]);
-
-  class ProcessManager {
-    private static getProcessByPID = (pid: number): RunningWinProcess | -1 => {
-      for (let i = 0; i < currentProcesses.length; i++) {
-        if (currentProcesses[i].pid === pid) {
-          return currentProcesses[i];
-        }
-      }
-      return -1;
-    };
-    private static getNewPID = () => {
-      for (let i = 0; i < Infinity; i++) {
-        if (this.getProcessByPID(i) === -1) {
-          return i;
-        }
-      }
-      return -1;
-    };
-    public static startProcess = (proc: WinProcess) => {
-      setCurrentProcesses([...currentProcesses, _.assign({ pid: this.getNewPID() }, proc)]);
-    };
-    public static killProgram = (pid: number) => {
-      setCurrentProcesses(
-        currentProcesses.filter(proc => {
-          return proc.pid !== pid;
-        })
-      );
-    };
-  }
-
-  class FolderManager {
-    public static getChildren = ( id: number) => {
-      return files.filter(file => {
-        return file.parent === id;
-      });
-    };
-  }
-
   useEffect(() => {
     // init values
-    const t_files = [];
-    t_files.push({
+    Global.files.push({
       id: 0,
-      filename: 'System',
+      filename: 'C',
       icon: require('./resource/icons/imageres_36.ico'),
       parent: -1,
-      driveLetter: 'C',
-      totalSizeB: 10,
-      usingSizeB: 10,
-    } as WinDrive);
+      type: FileType.Driver,
+    } as WinFile);
+  }, []);
 
-    t_files.push({
+  useEffect(() => {
+    Global.files.push({
       id: 1,
       filename: 'explorer.exe',
       icon: require('./resource/icons/imageres_3.ico'),
@@ -74,9 +36,21 @@ function App() {
         h: '500px',
         children: (
           <>
-            <div style={{backgroundColor: '#fff', position: 'absolute',width: '100%', height: 'calc( 100% - 30px )'}}>
-              {FolderManager.getChildren( -1).map(child => {
-                return <WinIconBox name={child.filename} color='black' noShadow icon={child.icon} />;
+            <div style={{ backgroundColor: '#fff', position: 'absolute', width: '100%', height: 'calc( 100% - 30px )' }}>
+              {FolderManager.getChildren(-1).map(child => {
+                console.log(Global.files);
+                return (
+                  <WinIconBox
+                    name={child.filename}
+                    color="black"
+                    noShadow
+                    icon={child.icon}
+                    onDoubleClick={() => {
+                      ProcessManager.startProcess(Global.files[1] as WinFile);
+                      console.log(Global.currentProcesses);
+                    }}
+                  />
+                );
               })}
             </div>
           </>
@@ -84,8 +58,8 @@ function App() {
         title: '资源管理器',
         icon: require('./resource/icons/imageres_3.ico'),
       } as WinWindowStruct,
-    } as WinProcess);
-    setFiles(t_files);
+    } as WinFile);
+    //setFiles(t_files);
   }, []);
 
   return (
@@ -133,8 +107,8 @@ function App() {
                 name="此电脑"
                 icon={require('./resource/icons/imageres_109.ico')}
                 onDoubleClick={() => {
-                  ProcessManager.startProcess(files[1] as WinProcess);
-                  console.log(currentProcesses);
+                  ProcessManager.startProcess(Global.files[1] as WinFile);
+                  console.log(Global.currentProcesses);
                 }}
               />
               <WinIconBox name="helloworld.exe" icon={require('./resource/icons/imageres_15.ico')} />
@@ -151,7 +125,7 @@ function App() {
                 </div>
               </>
             </WinWindow>
-            {currentProcesses.map((process: RunningWinProcess) => {
+            {Global.currentProcesses.map((process: RunningWinProcess) => {
               return getWindowJSX(process.window, 2, 2);
             })}
 
