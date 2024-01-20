@@ -26,4 +26,5 @@ export interface WinFile {
 
 export interface RunningWinProcess extends WinFile {
   pid: number;
+  // zIndex: number;
 }

@@ -1,8 +1,7 @@
-import { RunningWinProcess, WinFile } from "./interfaces";
+import { RunningWinProcess, WinFile } from './interfaces';
 
-export class Global{
-  public static currentProcesses:RunningWinProcess[] = [];
+export class Global {
+  public static currentProcesses: RunningWinProcess[] = [];
 
-  
-  public static files: (WinFile)[] = [];
+  public static files: WinFile[] = [];
 }

@@ -23,7 +23,7 @@
 }
 
 .taskbaritem.focus {
-  background-color:rgba(255, 255, 255, 0.25) ;
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 .taskbaritem.long span {
@@ -79,6 +79,18 @@
 }
 
 .taskbar {
+  position: fixed;
+  height: 40px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 3;
+  background-color: rgb(0 0 0 / 80%);
+  display: flex;
+  cursor: default;
+  align-items: center;
+  gap: 1px;
+  justify-content: space-between;
 }
 .taskbar:before {
   content: '';
@@ -103,4 +115,33 @@
   background-size: 100%;
   filter: blur(10px);
   z-index: -2;
+}
+
+.desktop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.backgroundimage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.icons {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
 }

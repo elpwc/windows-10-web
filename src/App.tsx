@@ -10,142 +10,64 @@ import { getWindowJSX } from './utils';
 import { Global } from './global';
 import { FolderManager } from './folderManager';
 import { ProcessManager } from './processManager';
+import Explorer from './programs/Explorer';
+import TaskbarItem from './components/TaskbarItem';
+import Helloworld from './programs/helloworld';
+import { initFolders } from './initial';
 
 function App() {
-  useEffect(() => {
-    // init values
-    Global.files.push({
-      id: 0,
-      filename: 'C',
-      icon: require('./resource/icons/imageres_36.ico'),
-      parent: -1,
-      type: FileType.Driver,
-    } as WinFile);
-  }, []);
+  const [update, setUpdate]: [boolean, any] = useState(true);
+  const [focus, setFocus]: [number, any] = useState(-1);
 
   useEffect(() => {
-    Global.files.push({
-      id: 1,
-      filename: 'explorer.exe',
-      icon: require('./resource/icons/imageres_3.ico'),
-      parent: 0,
-      window: {
-        x: 100,
-        y: 100,
-        w: '500px',
-        h: '500px',
-        children: (
-          <>
-            <div style={{ backgroundColor: '#fff', position: 'absolute', width: '100%', height: 'calc( 100% - 30px )' }}>
-              {FolderManager.getChildren(-1).map(child => {
-                console.log(Global.files);
-                return (
-                  <WinIconBox
-                    name={child.filename}
-                    color="black"
-                    noShadow
-                    icon={child.icon}
-                    onDoubleClick={() => {
-                      ProcessManager.startProcess(Global.files[1] as WinFile);
-                      console.log(Global.currentProcesses);
-                    }}
-                  />
-                );
-              })}
-            </div>
-          </>
-        ),
-        title: '资源管理器',
-        icon: require('./resource/icons/imageres_3.ico'),
-      } as WinWindowStruct,
-    } as WinFile);
-    //setFiles(t_files);
+    // init values
+    Global.files = initFolders(setUpdate(!update));
+
+    setUpdate(!update);
   }, []);
 
   return (
     <div className="App">
       <div>
-        <div
-          className="desktop"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-          }}
-        >
-          <div
-            className="backgroundimage"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              zIndex: 0,
-            }}
-          >
-            <div
-              className="icons"
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                zIndex: 1,
+        <div className="desktop">
+          <div className="backgroundimage">
+            <div className="icons">
+              {Global.currentProcesses.map((process: RunningWinProcess) => {
+                return getWindowJSX(process.window, process.id, process.pid, -1, () => {
+                  setUpdate(!update);
+                });
+              })}
 
-                display: 'flex',
-                flexDirection: 'column',
-                flexWrap: 'wrap',
-                gap: '10px',
-              }}
-            >
-              <WinIconBox name="回收站" icon={require('./resource/icons/imageres_55.ico')} />
-              <WinIconBox
-                name="此电脑"
-                icon={require('./resource/icons/imageres_109.ico')}
-                onDoubleClick={() => {
-                  ProcessManager.startProcess(Global.files[1] as WinFile);
-                  console.log(Global.currentProcesses);
-                }}
-              />
-              <WinIconBox name="helloworld.exe" icon={require('./resource/icons/imageres_15.ico')} />
+              {FolderManager.getChildren(0).map((child: WinFile) => {
+                console.log(FolderManager.getChildren(0));
+                return (
+                  <WinIconBox
+                    key={child.id}
+                    name={child.filename}
+                    color="black"
+                    noShadow
+                    icon={child.icon}
+                    onDoubleClick={() => {
+                      if (child.type === FileType.Driver || child.type === FileType.Folder) {
+                        console.log(child);
+                        ProcessManager.startProcess(
+                          Global.files.filter(file => {
+                            return file.filename === 'explorer.exe';
+                          })[0] as WinFile
+                        );
+                        setUpdate(!update);
+                      } else if (child.type === FileType.Program) {
+                        ProcessManager.startProcessById(child.id);
+
+                        setUpdate(!update);
+                      }
+                    }}
+                  />
+                );
+              })}
             </div>
 
-            <WinWindow x={100} y={100} w={'300px'} h={'200px'} hwnd={0} title={'helloworld.exe'} zIndex={2} icon={require('./resource/icons/imageres_15.ico')}>
-              <>
-                <div style={{ height: '90%', width: '90%', padding: '5px', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui', justifyContent: 'space-between' }}>
-                  <span>Hello, world</span>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'right' }}>
-                    <WinButton w="80px">Ok</WinButton>
-                    <WinButton w="80px">Cancel</WinButton>
-                  </div>
-                </div>
-              </>
-            </WinWindow>
-            {Global.currentProcesses.map((process: RunningWinProcess) => {
-              return getWindowJSX(process.window, 2, 2);
-            })}
-
-            <div
-              className="taskbar"
-              style={{
-                position: 'fixed',
-                height: '40px',
-                left: 0,
-                bottom: 0,
-                right: 0,
-                zIndex: 3,
-                backgroundColor: 'rgb(0 0 0 / 80%)',
-                display: 'flex',
-                cursor: 'default',
-                alignItems: 'center',
-                gap: '1px',
-                justifyContent: 'space-between',
-              }}
-            >
+            <div className="taskbar">
               <div style={{ height: '100%', display: 'flex', gap: '1px', alignItems: 'center' }}>
                 <div className="taskbaritem" style={{ width: '2.5em' }}>
                   <WindowsLogoSVG />
@@ -155,23 +77,9 @@ function App() {
                   <span style={{ paddingLeft: '10px', paddingRight: '50px' }}>在这里输入你要搜索的内容</span>
                 </div>
 
-                <div className="taskbaritem long">
-                  <img src={require('./resource/icons/imageres_109.ico')} />
-                </div>
-                <div className="taskbaritem long open focus" style={{ maxWidth: '150px', width: '150px' }}>
-                  <div className="taskbaritemContents">
-                    <img src={require('./resource/icons/imageres_15.ico')} />
-                    <span>helloworld.exe</span>
-                  </div>
-                  <div className="taskbaritemBorders"></div>
-                </div>
-                <div className="taskbaritem long open" style={{ maxWidth: '150px', width: '150px' }}>
-                  <div className="taskbaritemContents">
-                    <img src={require('./resource/icons/imageres_3.ico')} />
-                    <span>test</span>
-                  </div>
-                  <div className="taskbaritemBorders"></div>
-                </div>
+                {Global.currentProcesses.map(currentProcess => {
+                  return <TaskbarItem process={currentProcess} focus={false} key={currentProcess.pid} />;
+                })}
               </div>
 
               <div style={{ height: '100%', display: 'flex', gap: '1px', alignItems: 'center' }}>

@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
 import { CloseSVG, MaximizeSVG, MinimizeSVG } from '../../svg';
 import './index.css';
+import { ProcessManager } from '../../processManager';
+import { Global } from '../../global';
 
 interface WindowProps {
   x: number;
   y: number;
   w: string;
   h: string;
-  hwnd: number;
+  id: number;
+  pid: number;
+  hwnd: string;
   children?: JSX.Element | never[];
   title: string;
   zIndex: number;
   icon: string;
   titleBar?: JSX.Element | never[];
+  setUpdate: () => void;
 }
 
 interface Point {
@@ -39,7 +44,7 @@ export default (props: WindowProps) => {
   return (
     <>
       <div
-        id={'window' + String(props.hwnd)}
+        id={'window' + String(props.pid)}
         style={{
           position: 'fixed',
           top: crtWinPosition.y,
@@ -72,19 +77,19 @@ export default (props: WindowProps) => {
             }
           }}
         ></div>
-        <div
-          className="titlebar"
-          onMouseDown={e => {
-            setLastPosition({ x: e.clientX, y: e.clientY });
-            setIsMouseDown(true);
-          }}
-          onMouseUp={() => {
-            setIsMouseDown(false);
-          }}
-        >
-          <div className="titlebarTitle">
+        <div className="titlebar">
+          <div
+            className="titlebarTitle"
+            onMouseDown={e => {
+              setLastPosition({ x: e.clientX, y: e.clientY });
+              setIsMouseDown(true);
+            }}
+            onMouseUp={() => {
+              setIsMouseDown(false);
+            }}
+          >
             <img src={props.icon} height="15px" style={{ margin: '0 5px' }} />
-            <span>{props.title}</span>
+            <span style={{ width: 'inherit' }}>{props.title}</span>
           </div>
           <div className="controlBtns" style={{ color: 'white' }}>
             <button className="minbtn">
@@ -93,7 +98,16 @@ export default (props: WindowProps) => {
             <button className="maxbtn">
               <MaximizeSVG />
             </button>
-            <button className="closebtn">
+            <button
+              className="closebtn"
+              onClick={() => {
+                console.log(Global.currentProcesses);
+                ProcessManager.killProcess(props.pid);
+                console.log(Global.currentProcesses);
+
+                props.setUpdate();
+              }}
+            >
               <CloseSVG />
             </button>
           </div>
