@@ -5,6 +5,7 @@ interface WinIconBoxProps {
   name: string;
   color?: string;
   noShadow?: boolean;
+  shadowColor?: string;
   processId?: number;
   onDoubleClick?: (processId: number) => void;
 }
@@ -18,7 +19,7 @@ export default (props: WinIconBoxProps) => {
       }}
     >
       <img src={props.icon} />
-      <p style={{ color: props.color ?? 'white', textShadow: props.noShadow ? 'none' : '0 0 3px #000' }}>{props.name}</p>
+      <p style={{ color: props.color ?? 'white', textShadow: props.noShadow ? 'none' : '0 0 3px ' + (props.shadowColor ?? '#000') }}>{props.name}</p>
     </div>
   );
 };

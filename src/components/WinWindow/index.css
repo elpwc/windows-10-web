@@ -1,6 +1,5 @@
 .titlebar {
   display: flex;
-  background-color: rgb(69, 87, 87);
   color: white;
   height: 30px;
   font-size: 0.8em;
@@ -12,6 +11,7 @@
   display: flex;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .content {
@@ -19,6 +19,7 @@
   width: 100%;
   height: calc( 100% - 30px );
   box-sizing:content-box;
+  display: flex;
 }
 
 .controlBtns {

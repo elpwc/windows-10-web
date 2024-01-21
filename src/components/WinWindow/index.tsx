@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
-import { CloseSVG, MaximizeSVG, MinimizeSVG } from '../../svg';
+import { CloseSVG, MaximizeSVG, MinimizeSVG, RestoreMaximizeSVG } from '../../svg';
 import './index.css';
+import { ProcessManager } from '../../processManager';
+import { WindowStatus } from '../../interfaces';
 
 interface WindowProps {
   x: number;
   y: number;
   w: string;
   h: string;
-  hwnd: number;
+  id: number;
+  pid: number;
+  hwnd: string;
   children?: JSX.Element | never[];
   title: string;
   zIndex: number;
   icon: string;
+  titleBar?: JSX.Element | never[];
+  setUpdate: () => void;
+  onFocus: () => void;
 }
 
 interface Point {
@@ -33,12 +40,17 @@ export default (props: WindowProps) => {
       x: props.x,
       y: props.y,
     });
-  }, []);
+  }, [props.x, props.y]);
 
+  let crtProcessStatus = WindowStatus.Default;
+  const crtProcess = ProcessManager.getProcessByPID(props.pid);
+  if (crtProcess !== -1) {
+    crtProcessStatus = crtProcess.status;
+  }
   return (
     <>
       <div
-        id={'window' + String(props.hwnd)}
+        id={'window' + String(props.pid)}
         style={{
           position: 'fixed',
           top: crtWinPosition.y,
@@ -48,6 +60,9 @@ export default (props: WindowProps) => {
           border: 'solid 1px rgb(69, 87, 87)',
           boxShadow: '0px 0px 4px 0 rgb(100 100 100)',
           zIndex: props.zIndex,
+        }}
+        onMouseDown={() => {
+          props.onFocus();
         }}
       >
         <div
@@ -71,28 +86,53 @@ export default (props: WindowProps) => {
             }
           }}
         ></div>
-        <div
-          className="titlebar"
-          onMouseDown={e => {
-            setLastPosition({ x: e.clientX, y: e.clientY });
-            setIsMouseDown(true);
-          }}
-          onMouseUp={() => {
-            setIsMouseDown(false);
-          }}
-        >
-          <div className="titlebarTitle">
+        <div className="titlebar" style={{ backgroundColor: props.zIndex === 0 ? 'rgb(69, 87, 87)' : '#7b9393' }}>
+          <div
+            className="titlebarTitle"
+            onMouseDown={e => {
+              setLastPosition({ x: e.clientX, y: e.clientY });
+              setIsMouseDown(true);
+            }}
+            onMouseUp={() => {
+              setIsMouseDown(false);
+            }}
+          >
             <img src={props.icon} height="15px" style={{ margin: '0 5px' }} />
-            <span>{props.title}</span>
+            <span style={{ width: 'inherit' }}>{props.title}</span>
           </div>
           <div className="controlBtns" style={{ color: 'white' }}>
-            <button className="minbtn">
+            <button
+              className="minbtn"
+              onClick={() => {
+                ProcessManager.setWindowStatus(props.pid, WindowStatus.Minimum);
+
+                props.setUpdate();
+              }}
+            >
               <MinimizeSVG />
             </button>
-            <button className="maxbtn">
-              <MaximizeSVG />
+            <button
+              className="maxbtn"
+              onClick={() => {
+                if (crtProcessStatus === WindowStatus.Default) {
+                  ProcessManager.setWindowStatus(props.pid, WindowStatus.Maximum);
+                } else if (crtProcessStatus === WindowStatus.Maximum) {
+                  ProcessManager.setWindowStatus(props.pid, WindowStatus.Default);
+                }
+
+                props.setUpdate();
+              }}
+            >
+              {crtProcessStatus === WindowStatus.Maximum ? <RestoreMaximizeSVG /> : <MaximizeSVG />}
             </button>
-            <button className="closebtn">
+            <button
+              className="closebtn"
+              onClick={() => {
+                ProcessManager.killProcess(props.pid);
+
+                props.setUpdate();
+              }}
+            >
               <CloseSVG />
             </button>
           </div>

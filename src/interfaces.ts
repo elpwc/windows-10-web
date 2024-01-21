@@ -8,9 +8,31 @@ export interface WinWindowStruct {
   icon: string;
 }
 
-export interface WinIcon {
+export enum FileType {
+  Default,
+  Folder,
+  Program,
+  Driver,
+}
+
+export interface WinFile {
   id: number;
   filename: string;
   icon: string;
   parent: number;
+  type: FileType;
+  window?: WinWindowStruct | null;
+}
+
+export enum WindowStatus {
+  Default,
+  Maximum,
+  Minimum,
+}
+
+export interface RunningWinProcess extends WinFile {
+  pid: number;
+  zIndex: number;
+  status: WindowStatus;
+  lastStatus?: WindowStatus;
 }
