@@ -1,5 +1,5 @@
 import { FileType, WinFile, WinWindowStruct } from './interfaces';
-import Explorer from './programs/Explorer';
+import Explorer from './programs/explorer';
 import Helloworld from './programs/helloworld';
 
 export const initFolders = (setUpdate: () => void) => {
