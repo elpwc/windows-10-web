@@ -1,6 +1,5 @@
 .titlebar {
   display: flex;
-  background-color: rgb(69, 87, 87);
   color: white;
   height: 30px;
   font-size: 0.8em;

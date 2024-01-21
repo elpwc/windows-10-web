@@ -1,29 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import WinButton from './components/WinButton';
-import WinWindow from './components/WinWindow';
-import { FileType, RunningWinProcess, WinFile, WinWindowStruct } from './interfaces';
+import { FileType, RunningWinProcess, WinFile, WindowStatus } from './interfaces';
 import { SearchSVG, WindowsLogoSVG } from './svg';
-import _ from 'lodash';
 import WinIconBox from './components/WinIconBox';
 import { getWindowJSX } from './utils';
 import { Global } from './global';
 import { FolderManager } from './folderManager';
 import { ProcessManager } from './processManager';
-import Explorer from './programs/Explorer';
 import TaskbarItem from './components/TaskbarItem';
-import Helloworld from './programs/helloworld';
 import { initFolders } from './initial';
 
 function App() {
-  const [update, setUpdate]: [boolean, any] = useState(true);
-  const [focus, setFocus]: [number, any] = useState(-1);
+  const [update, setUpdate]: [number, any] = useState(Math.random());
+  const [time, setTime]: [number, any] = useState(Date.now());
+
+  const useUpdate = () => {
+    console.log(update);
+    setUpdate(Math.random());
+    console.log(update);
+  };
 
   useEffect(() => {
     // init values
-    Global.files = initFolders(setUpdate(!update));
+    Global.files = initFolders(() => {
+      setTimeout(() => {
+        useUpdate();
+        console.log(123);
+      }, 200);
+    });
 
-    setUpdate(!update);
+    setInterval(() => {
+      setTime(Date.now());
+    }, 1000);
+
+    useUpdate();
   }, []);
 
   return (
@@ -32,39 +42,59 @@ function App() {
         <div className="desktop">
           <div className="backgroundimage">
             <div className="icons">
-              {Global.currentProcesses.map((process: RunningWinProcess) => {
-                return getWindowJSX(process.window, process.id, process.pid, -1, () => {
-                  setUpdate(!update);
-                });
-              })}
+              {/* Windows */}
+              {Global.currentProcesses.map((process: RunningWinProcess, j: number) => {
+                return getWindowJSX(
+                  process.window,
+                  process.id,
+                  process.pid,
+                  process.zIndex,
+                  process.status,
+                  () => {
+                    for (let i = 0; i < Global.currentProcesses.length; i++) {
+                      Global.currentProcesses[i].zIndex--;
+                    }
+                    Global.currentProcesses[j].zIndex = 0;
 
-              {FolderManager.getChildren(0).map((child: WinFile) => {
-                console.log(FolderManager.getChildren(0));
-                return (
-                  <WinIconBox
-                    key={child.id}
-                    name={child.filename}
-                    color="black"
-                    noShadow
-                    icon={child.icon}
-                    onDoubleClick={() => {
-                      if (child.type === FileType.Driver || child.type === FileType.Folder) {
-                        console.log(child);
-                        ProcessManager.startProcess(
-                          Global.files.filter(file => {
-                            return file.filename === 'explorer.exe';
-                          })[0] as WinFile
-                        );
-                        setUpdate(!update);
-                      } else if (child.type === FileType.Program) {
-                        ProcessManager.startProcessById(child.id);
-
-                        setUpdate(!update);
-                      }
-                    }}
-                  />
+                    useUpdate();
+                  },
+                  () => {
+                    useUpdate();
+                  }
                 );
               })}
+
+              {/* Desktop Icons */}
+              <div style={{ zIndex: -1145141919810 }}>
+                {FolderManager.getChildren(0).map((child: WinFile) => {
+                  console.log(FolderManager.getChildren(0));
+                  return (
+                    <WinIconBox
+                      key={child.id}
+                      name={child.filename}
+                      color="white"
+                      noShadow={false}
+                      shadowColor="black"
+                      icon={child.icon}
+                      onDoubleClick={() => {
+                        if (child.type === FileType.Driver || child.type === FileType.Folder) {
+                          console.log(child);
+                          ProcessManager.startProcess(
+                            Global.files.filter(file => {
+                              return file.filename === 'explorer.exe';
+                            })[0] as WinFile
+                          );
+                          useUpdate();
+                        } else if (child.type === FileType.Program) {
+                          ProcessManager.startProcessById(child.id);
+
+                          useUpdate();
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </div>
 
             <div className="taskbar">
@@ -77,8 +107,28 @@ function App() {
                   <span style={{ paddingLeft: '10px', paddingRight: '50px' }}>在这里输入你要搜索的内容</span>
                 </div>
 
+                {/* Taskbar Icons */}
                 {Global.currentProcesses.map(currentProcess => {
-                  return <TaskbarItem process={currentProcess} focus={false} key={currentProcess.pid} />;
+                  return (
+                    <TaskbarItem
+                      process={currentProcess}
+                      focus={currentProcess.zIndex === 0}
+                      key={currentProcess.pid}
+                      onClick={() => {
+                        const crtProcess = ProcessManager.getProcessByPID(currentProcess.pid);
+                        if (crtProcess !== -1) {
+                          const crtProcessStatus = crtProcess.status;
+                          if (crtProcessStatus === WindowStatus.Default || crtProcessStatus === WindowStatus.Maximum) {
+                            ProcessManager.setWindowStatus(currentProcess.pid, WindowStatus.Minimum);
+                          } else if (crtProcessStatus === WindowStatus.Minimum) {
+                            ProcessManager.setWindowStatus(currentProcess.pid, currentProcess.lastStatus ?? WindowStatus.Default);
+                          }
+                        }
+
+                        useUpdate();
+                      }}
+                    />
+                  );
                 })}
               </div>
 
@@ -91,9 +141,13 @@ function App() {
                 <div className="taskbaritem" style={{ textAlign: 'center' }}>
                   <div className="taskbaritemContents">
                     <span>
-                      11:45
+                      {new Date(time).getHours().toString().padStart(2, '0') +
+                        ':' +
+                        new Date(time).getMinutes().toString().padStart(2, '0') +
+                        ':' +
+                        new Date(time).getSeconds().toString().padStart(2, '0')}
                       <br />
-                      2022/02/15
+                      {new Date(time).getFullYear() + '/' + (new Date(time).getMonth() + 1).toString().padStart(2, '0') + '/' + new Date(time).getDate().toString().padStart(2, '0')}
                     </span>
                   </div>
                 </div>

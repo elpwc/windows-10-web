@@ -24,7 +24,15 @@ export interface WinFile {
   window?: WinWindowStruct | null;
 }
 
+export enum WindowStatus {
+  Default,
+  Maximum,
+  Minimum,
+}
+
 export interface RunningWinProcess extends WinFile {
   pid: number;
-  // zIndex: number;
+  zIndex: number;
+  status: WindowStatus;
+  lastStatus?: WindowStatus;
 }
